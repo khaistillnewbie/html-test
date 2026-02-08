@@ -1,6 +1,5 @@
 <!-- iOS Home Screen icon -->
 <link rel="apple-touch-icon" href="icon.png">
-<!-- Favicon browser -->
 <link rel="icon" href="icon.png" type="image/png">
 <meta name="theme-color" content="#ffffff">
 
@@ -47,6 +46,7 @@ table{width:100%;border-collapse:collapse;font-size:13px; display:block; overflo
 th,td{padding:10px;border-bottom:1px solid #e5e7eb; min-width:110px;}
 th{background:#f3f4f6;}
 footer{text-align:center;font-size:12px;color:var(--muted);margin-top:20px;}
+.over-limit{color:red; font-weight:700;}
 </style>
 </head>
 
@@ -139,19 +139,16 @@ function gmt8Now(){
   return new Date(utc + 8*60*60*1000);
 }
 
-// Set input default: last entry datetime or current GMT+8
-function setDatetimeInput(){ 
+// Set datetime input: last entry or now
+function setDatetimeInput(){
   const dtInput = document.getElementById("datetime");
-  if(data.length>0 && !dtInput.value){
-    dtInput.value = data[data.length-1].datetime;
-  } else if(!dtInput.value){
-    const current = gmt8Now();
-    dtInput.value = current.toISOString().slice(0,16);
+  if(!dtInput.value){
+    if(data.length>0) dtInput.value = data[data.length-1].datetime;
+    else dtInput.value = gmt8Now().toISOString().slice(0,16);
   }
 }
-setInterval(setDatetimeInput,1000);
-setDatetimeInput();
 
+// Smart dashboard render
 function render(){
   const tbody=document.getElementById("tableBody");
   tbody.innerHTML="";
@@ -178,7 +175,9 @@ function render(){
     const limit = parseFloat(document.getElementById("limit"+key.replace(" ","")).value);
     if(limit>0 && sum[key] > limit){
       dash[key].style.borderTopColor = "red";
+      dash[key].classList.add("over-limit");
     } else {
+      dash[key].classList.remove("over-limit");
       if(key==="Cash") dash[key].style.borderTopColor="var(--cash)";
       if(key==="QR") dash[key].style.borderTopColor="var(--qr)";
       if(key==="Credit Card") dash[key].style.borderTopColor="var(--cc)";
@@ -186,11 +185,11 @@ function render(){
   });
 
   localStorage.setItem("spendingData",JSON.stringify(data));
+  setDatetimeInput();
 }
 
 function addEntry(){
   if(!desc.value||!amount.value) return alert("Isi semua dulu");
-  // Force GMT+8
   let dt = new Date(datetime.value);
   const offset = dt.getTimezoneOffset()*60000;
   dt = new Date(dt.getTime() - offset);
