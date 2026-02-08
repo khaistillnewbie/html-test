@@ -13,29 +13,15 @@
   --cash:#22c55e; --qr:#0ea5e9; --cc:#f59e0b;
   --text:#1f2937; --muted:#6b7280;
 }
-body{
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-  background:var(--bg); margin:0; padding:16px;
-}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); margin:0; padding:16px;}
 .center{text-align:center;}
 h2{margin:0;}
 .subtitle{color:var(--muted); font-size:14px; margin-bottom:20px;}
-
-.dashboard-container{
-  display:flex; justify-content:space-between; gap:10px;
-  flex-wrap:wrap; margin-bottom:20px;
-}
-.dashboard-card{
-  flex:1; min-width:90px;
-  background:var(--card); border-radius:12px;
-  padding:16px; box-shadow:0 8px 16px rgba(0,0,0,0.05);
-  text-align:center; cursor:pointer;
-  transition: transform 0.1s;
-}
+.dashboard-container{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
+.dashboard-card{flex:1; min-width:90px; background:var(--card); border-radius:12px; padding:16px; box-shadow:0 8px 16px rgba(0,0,0,0.05); text-align:center; cursor:pointer; transition: transform 0.1s;}
 .dashboard-card:hover{transform:scale(1.03);}
 .dashboard-card h3{margin:0;font-size:14px;color:var(--muted);}
 .dashboard-card p{margin:4px 0 0; font-size:18px; font-weight:600;}
-
 .card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:16px; box-shadow:0 10px 20px rgba(0,0,0,0.06);}
 label{display:block;font-size:13px;color:var(--muted);margin-top:10px;}
 input,select,button{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #e5e7eb;font-size:15px;}
@@ -128,24 +114,16 @@ footer{text-align:center;font-size:12px;color:var(--muted);margin-top:20px;}
 let data = JSON.parse(localStorage.getItem("spendingData")) || [];
 let currentFilter = null;
 
-// GMT+8 helper
-function gmt8Now(){
-  const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset()*60000);
-  return new Date(utc + 8*60*60*1000);
+function formatDateTime(dtStr){
+  const dt = new Date(dtStr);
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth()+1).padStart(2,'0');
+  const d = String(dt.getDate()).padStart(2,'0');
+  const h = String(dt.getHours()).padStart(2,'0');
+  const min = String(dt.getMinutes()).padStart(2,'0');
+  return `${y}-${m}-${d} ${h}:${min}`;
 }
 
-// Set datetime input default to GMT+8 but editable
-function setDefaultDatetime(){
-  const dtInput = document.getElementById("datetime");
-  if(!dtInput.value){
-    const current = gmt8Now();
-    dtInput.value = current.toISOString().slice(0,16);
-  }
-}
-setDefaultDatetime();
-
-// Render table & dashboard
 function render(){
   const tbody=document.getElementById("tableBody");
   tbody.innerHTML="";
@@ -154,11 +132,11 @@ function render(){
   data.forEach(d=>{
     if(currentFilter && d.payment !== currentFilter) return;
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${d.datetime.replace("T"," ")}</td>
+    tr.innerHTML=`<td>${d.datetime}</td>
       <td>${d.desc}</td><td>${d.category}</td><td>${d.payment}</td>
-      <td>${d.amount.toFixed(2)}</td>`;
+      <td>${parseFloat(d.amount).toFixed(2)}</td>`;
     tbody.appendChild(tr);
-    sum[d.payment]+=d.amount;
+    sum[d.payment]+=parseFloat(d.amount);
   });
 
   const dash = {
@@ -182,33 +160,23 @@ function render(){
   localStorage.setItem("spendingData",JSON.stringify(data));
 }
 
-// Add entry
 function addEntry(){
-  const descInput = document.getElementById("desc");
-  const amountInput = document.getElementById("amount");
-  const datetimeInput = document.getElementById("datetime");
+  if(!desc.value || !amount.value || !datetime.value) return alert("Isi semua dulu");
 
-  if(!descInput.value || !amountInput.value) return alert("Isi semua dulu");
-
-  let dt = new Date(datetimeInput.value);
-  const offset = dt.getTimezoneOffset()*60000;
-  dt = new Date(dt.getTime() - offset); // force GMT+8
-  const dtStr = dt.toISOString().slice(0,16);
+  const formattedDT = formatDateTime(datetime.value);
 
   data.push({
-    datetime: dtStr,
-    desc: descInput.value,
-    category:document.getElementById("category").value,
-    payment:document.getElementById("payment").value,
-    amount:parseFloat(amountInput.value)
+    datetime: formattedDT,
+    desc: desc.value.trim(),
+    category: category.value,
+    payment: payment.value,
+    amount: parseFloat(amount.value)
   });
 
-  descInput.value=""; amountInput.value="";
-  setDefaultDatetime();
+  desc.value=""; amount.value=""; datetime.value="";
   render();
 }
 
-// Export CSV
 function exportCSV(){
   let csv="Date,Description,Category,Payment,Amount\n";
   data.forEach(d=>{
@@ -221,13 +189,12 @@ function exportCSV(){
   a.click();
 }
 
-// Import CSV
 function importCSV(event){
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = function(e){
-    const lines = e.target.result.split("\n").slice(1);
-    lines.forEach(line=>{
+    const text = e.target.result.split("\n").slice(1);
+    text.forEach(line=>{
       if(!line) return;
       const [datetime,desc,category,payment,amount] = line.split(",");
       data.push({datetime,desc,category,payment,amount:parseFloat(amount)});
@@ -237,16 +204,15 @@ function importCSV(event){
   reader.readAsText(file);
 }
 
-// Dashboard filter
 document.querySelectorAll(".dashboard-card").forEach(card=>{
   card.addEventListener("click",()=>{
     const pay = card.dataset.pay;
-    currentFilter = currentFilter===pay ? null : pay;
+    if(currentFilter === pay) currentFilter = null;
+    else currentFilter = pay;
     render();
   });
 });
 
-// Initial render
 render();
 </script>
 </body>
