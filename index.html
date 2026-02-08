@@ -17,6 +17,7 @@
   --cash:#22c55e; --qr:#0ea5e9; --cc:#f59e0b;
   --text:#1f2937; --muted:#6b7280;
 }
+* { box-sizing: border-box; }
 body{
   font-family:-apple-system,BlinkMacSystemFont,sans-serif;
   background:var(--bg); margin:0; padding:16px;
@@ -25,6 +26,7 @@ body{
 h2{margin:0;}
 .subtitle{color:var(--muted); font-size:14px; margin-bottom:20px;}
 
+/* Dashboard Cards */
 .dashboard-container{
   display:flex; gap:10px; margin-bottom:20px;
 }
@@ -36,9 +38,211 @@ h2{margin:0;}
   box-shadow:0 8px 16px rgba(0,0,0,0.05);
   text-align:center;
   cursor:pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.dashboard-card:hover{
+  transform: translateY(-2px);
+  box-shadow:0 12px 24px rgba(0,0,0,0.1);
 }
 .dashboard-card h3{margin:0;font-size:14px;color:var(--muted);}
-.dashboard-card p{margin-top:6px;font-size:18px;font-weight:600;}
+.dashboard-card p{margin-top:6px;font-size:20px;font-weight:600;}
+.dashboard-card .daily-avg{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:4px;
+}
+.dashboard-card .tap-hint{
+  font-size:10px;
+  color:var(--primary);
+  margin-top:6px;
+  opacity:0.7;
+}
+
+/* Stats Row */
+.stats-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+.stat-box{
+  flex:1;
+  background:var(--card);
+  border-radius:10px;
+  padding:12px;
+  text-align:center;
+  box-shadow:0 4px 8px rgba(0,0,0,0.05);
+}
+.stat-box h4{
+  margin:0;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:500;
+}
+.stat-box p{
+  margin:4px 0 0 0;
+  font-size:18px;
+  font-weight:600;
+  color:var(--primary);
+}
+
+/* Date Filter */
+.filter-section{
+  background:var(--card);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.05);
+}
+.filter-buttons{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:8px;
+  margin-bottom:12px;
+}
+.filter-btn{
+  padding:8px;
+  border:2px solid #e5e7eb;
+  background:white;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:500;
+  transition:all 0.2s;
+}
+.filter-btn:hover{
+  border-color:var(--primary);
+}
+.filter-btn.active{
+  background:var(--primary);
+  color:white;
+  border-color:var(--primary);
+}
+.custom-date-range{
+  display:none;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:8px;
+}
+.custom-date-range.show{
+  display:grid;
+}
+
+/* Modal for Transaction Details */
+.modal{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:1000;
+  overflow-y:auto;
+}
+.modal.show{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:20px;
+}
+.modal-content{
+  background:var(--card);
+  border-radius:16px;
+  padding:24px;
+  max-width:500px;
+  width:100%;
+  margin-top:20px;
+  max-height:80vh;
+  overflow-y:auto;
+  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+  animation:slideIn 0.3s ease;
+}
+@keyframes slideIn{
+  from{opacity:0;transform:translateY(-20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:2px solid #e5e7eb;
+}
+.modal-header h3{
+  margin:0;
+  font-size:18px;
+}
+.close-btn{
+  background:none;
+  border:none;
+  font-size:24px;
+  cursor:pointer;
+  padding:0;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  transition:background 0.2s;
+}
+.close-btn:hover{
+  background:#f3f4f6;
+}
+.transaction-item{
+  padding:12px;
+  border-radius:8px;
+  background:#f9fafb;
+  margin-bottom:8px;
+  border-left:4px solid var(--primary);
+}
+.transaction-item .header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+.transaction-item .desc{
+  font-weight:600;
+  font-size:14px;
+}
+.transaction-item .amount{
+  font-weight:700;
+  font-size:15px;
+  color:var(--primary);
+}
+.transaction-item .meta{
+  font-size:11px;
+  color:var(--muted);
+}
+.modal-summary{
+  background:#f0f9ff;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:16px;
+  text-align:center;
+}
+.modal-summary .total{
+  font-size:28px;
+  font-weight:700;
+  color:var(--primary);
+}
+.modal-summary .count{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+.empty-state{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--muted);
+}
+.empty-state .emoji{
+  font-size:48px;
+  margin-bottom:12px;
+}
 
 .card{
   background:var(--card);
@@ -56,15 +260,38 @@ input,select,button{
 button{
   border:none;background:var(--primary);
   color:white;font-weight:600;cursor:pointer;
+  margin-top:12px;
 }
+button:hover{opacity:0.9;}
+.btn-secondary{background:#6b7280;}
 table{
   width:100%;border-collapse:collapse;font-size:13px;
 }
 th,td{
   padding:10px;border-bottom:1px solid #e5e7eb;
+  text-align:left;
 }
-th{background:#f3f4f6;}
-footer{text-align:center;font-size:12px;color:var(--muted);}
+th{background:#f3f4f6;font-weight:600;}
+.delete-btn{
+  background:#ef4444;
+  color:white;
+  border:none;
+  padding:4px 8px;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:11px;
+}
+.delete-btn:hover{background:#dc2626;}
+.status{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:4px;
+  font-size:11px;
+  margin-top:8px;
+}
+.status.success{background:#dcfce7;color:#16a34a;}
+.status.error{background:#fee2e2;color:#dc2626;}
+footer{text-align:center;font-size:12px;color:var(--muted);margin-top:20px;}
 </style>
 </head>
 
@@ -73,28 +300,74 @@ footer{text-align:center;font-size:12px;color:var(--muted);}
 <div class="center">
   <h2>Spending Tracker PRO</h2>
   <div class="subtitle">
-    “Awareness is the first step to wealth.”
+    "Awareness is the first step to wealth."
+  </div>
+  <div id="statusMsg"></div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row">
+  <div class="stat-box">
+    <h4>Total Spent</h4>
+    <p id="totalSpent">RM0.00</p>
+  </div>
+  <div class="stat-box">
+    <h4>Daily Average</h4>
+    <p id="dailyAvg">RM0.00</p>
+  </div>
+  <div class="stat-box">
+    <h4>Transactions</h4>
+    <p id="totalCount">0</p>
   </div>
 </div>
 
+<!-- Dashboard Cards -->
 <div class="dashboard-container">
   <div class="dashboard-card" id="dashCash" data-pay="Cash" style="border-top:4px solid var(--cash)">
-    <h3>Cash</h3><p>RM0.00</p>
+    <h3>💵 Cash</h3>
+    <p>RM0.00</p>
+    <div class="daily-avg">RM0/day</div>
+    <div class="tap-hint">👆 Tap for details</div>
   </div>
   <div class="dashboard-card" id="dashQR" data-pay="QR" style="border-top:4px solid var(--qr)">
-    <h3>QR</h3><p>RM0.00</p>
+    <h3>📱 QR</h3>
+    <p>RM0.00</p>
+    <div class="daily-avg">RM0/day</div>
+    <div class="tap-hint">👆 Tap for details</div>
   </div>
   <div class="dashboard-card" id="dashCC" data-pay="Credit Card" style="border-top:4px solid var(--cc)">
-    <h3>Credit Card</h3><p>RM0.00</p>
+    <h3>💳 Credit Card</h3>
+    <p>RM0.00</p>
+    <div class="daily-avg">RM0/day</div>
+    <div class="tap-hint">👆 Tap for details</div>
   </div>
 </div>
 
+<!-- Date Range Filter -->
+<div class="filter-section">
+  <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--muted);">📅 Filter by Date</h3>
+  <div class="filter-buttons">
+    <button class="filter-btn active" onclick="setDateFilter('all')">All Time</button>
+    <button class="filter-btn" onclick="setDateFilter('today')">Today</button>
+    <button class="filter-btn" onclick="setDateFilter('week')">This Week</button>
+    <button class="filter-btn" onclick="setDateFilter('month')">This Month</button>
+    <button class="filter-btn" onclick="setDateFilter('custom')">Custom</button>
+  </div>
+  <div class="custom-date-range" id="customRange">
+    <input type="date" id="startDate" onchange="applyCustomRange()">
+    <input type="date" id="endDate" onchange="applyCustomRange()">
+  </div>
+</div>
+
+<!-- Manual Entry Form -->
 <div class="card">
+  <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--muted);">➕ Add Spending</h3>
+  
   <label>Date & Time</label>
   <input type="datetime-local" id="datetime">
 
   <label>Description</label>
-  <input type="text" id="desc">
+  <input type="text" id="desc" placeholder="e.g. Nasi lemak McD">
 
   <label>Category</label>
   <select id="category">
@@ -115,112 +388,432 @@ footer{text-align:center;font-size:12px;color:var(--muted);}
   </select>
 
   <label>Amount (RM)</label>
-  <input type="number" id="amount" step="0.01">
+  <input type="number" id="amount" step="0.01" placeholder="0.00">
 
   <button onclick="addEntry()">+ Add Spending</button>
 </div>
 
+<!-- Export/Import -->
 <div class="card">
   <button onclick="exportCSV()">📤 Export CSV</button>
-  <input type="file" accept=".csv" onchange="importCSV(event)">
+  <button class="btn-secondary" onclick="document.getElementById('csvFile').click()">📥 Import CSV</button>
+  <input type="file" id="csvFile" accept=".csv" onchange="importCSV(event)" style="display:none">
+  <button class="btn-secondary" onclick="clearAllData()" style="background:#ef4444;">🗑️ Clear All Data</button>
 </div>
 
+<!-- Transaction History Table -->
 <div class="card">
+  <h3 style="margin:0 0 12px 0;font-size:16px;">
+    Spending History 
+    <span style="font-size:13px;color:var(--muted);font-weight:normal;">
+      (<span id="totalEntries">0</span> entries)
+    </span>
+  </h3>
   <table>
     <thead>
       <tr>
         <th>Date</th><th>Description</th>
-        <th>Category</th><th>Payment</th><th>RM</th>
+        <th>Category</th><th>Payment</th><th>RM</th><th></th>
       </tr>
     </thead>
     <tbody id="tableBody"></tbody>
   </table>
 </div>
 
-<footer>Made by Khai ❤️</footer>
+<!-- Transaction Details Modal -->
+<div class="modal" id="transactionModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">Transactions</h3>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-summary">
+      <div class="total" id="modalTotal">RM0.00</div>
+      <div class="count" id="modalCount">0 transactions</div>
+      <div class="count" id="modalAvg" style="margin-top:4px;font-size:13px;">Average: RM0/day</div>
+    </div>
+    <div id="modalTransactions"></div>
+  </div>
+</div>
+
+<footer>Made by Khai ❤️ | Data stored locally in your browser</footer>
 
 <script>
-let data = JSON.parse(localStorage.getItem("spendingData")) || [];
-let filter = null;
+// Initialize data
+let data = [];
+try {
+  const stored = localStorage.getItem("spendingData");
+  if (stored) {
+    data = JSON.parse(stored);
+    console.log("✅ Loaded", data.length, "entries");
+  }
+} catch (e) {
+  console.error("❌ Error loading data:", e);
+  showStatus("Error loading saved data", "error");
+}
 
-// default datetime now
-document.getElementById("datetime").value =
-  new Date().toISOString().slice(0,16);
+let dateFilter = 'all';
+let customStart = null;
+let customEnd = null;
+
+// Set default datetime to now
+document.getElementById("datetime").value = new Date().toISOString().slice(0,16);
 
 function saveData(){
-  localStorage.setItem("spendingData", JSON.stringify(data));
+  try {
+    localStorage.setItem("spendingData", JSON.stringify(data));
+    console.log("💾 Saved", data.length, "entries");
+    return true;
+  } catch (e) {
+    console.error("❌ Error saving:", e);
+    showStatus("Error saving data! Storage might be full.", "error");
+    return false;
+  }
+}
+
+function showStatus(msg, type="success"){
+  const el = document.getElementById("statusMsg");
+  el.innerHTML = `<span class="status ${type}">${msg}</span>`;
+  setTimeout(()=>el.innerHTML="", 3000);
+}
+
+function getDateRange(){
+  const now = new Date();
+  let start, end;
+  
+  switch(dateFilter){
+    case 'today':
+      start = new Date(now.setHours(0,0,0,0));
+      end = new Date(now.setHours(23,59,59,999));
+      break;
+    case 'week':
+      const day = now.getDay();
+      start = new Date(now.setDate(now.getDate() - day));
+      start.setHours(0,0,0,0);
+      end = new Date();
+      break;
+    case 'month':
+      start = new Date(now.getFullYear(), now.getMonth(), 1);
+      end = new Date();
+      break;
+    case 'custom':
+      if(customStart && customEnd){
+        start = new Date(customStart);
+        end = new Date(customEnd);
+        end.setHours(23,59,59,999);
+      }
+      break;
+    default:
+      return null;
+  }
+  
+  return {start, end};
+}
+
+function filterData(paymentType = null){
+  let filtered = data;
+  
+  // Filter by payment method if specified
+  if(paymentType){
+    filtered = filtered.filter(d => d.payment === paymentType);
+  }
+  
+  // Filter by date range
+  const range = getDateRange();
+  if(range){
+    filtered = filtered.filter(d => {
+      const date = new Date(d.datetime);
+      return date >= range.start && date <= range.end;
+    });
+  }
+  
+  return filtered;
+}
+
+function calculateDailyAverage(filteredData){
+  if(filteredData.length === 0) return 0;
+  
+  const range = getDateRange();
+  let days = 1;
+  
+  if(range){
+    const diffTime = Math.abs(range.end - range.start);
+    days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  } else {
+    // All time: calculate from first to last transaction
+    const dates = filteredData.map(d => new Date(d.datetime));
+    const firstDate = new Date(Math.min(...dates));
+    const lastDate = new Date(Math.max(...dates));
+    const diffTime = Math.abs(lastDate - firstDate);
+    days = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1);
+  }
+  
+  const total = filteredData.reduce((sum, d) => sum + d.amount, 0);
+  return total / days;
 }
 
 function render(){
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
+  
+  const filtered = filterData();
+  const sorted = [...filtered].sort((a,b)=> new Date(b.datetime) - new Date(a.datetime));
+  
   let sum = {Cash:0, QR:0, "Credit Card":0};
-
-  data.forEach(d=>{
-    if(filter && d.payment!==filter) return;
+  let totalSum = 0;
+  
+  // Render table
+  sorted.forEach((d)=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`
       <td>${d.datetime.replace("T"," ")}</td>
       <td>${d.desc}</td>
       <td>${d.category}</td>
       <td>${d.payment}</td>
-      <td>${d.amount.toFixed(2)}</td>`;
+      <td>RM ${d.amount.toFixed(2)}</td>
+      <td><button class="delete-btn" onclick="deleteEntry(${data.indexOf(d)})">❌</button></td>`;
     tbody.appendChild(tr);
-    sum[d.payment]+=d.amount;
+    sum[d.payment] += d.amount;
+    totalSum += d.amount;
   });
-
-  document.querySelector("#dashCash p").innerText=`RM${sum.Cash.toFixed(2)}`;
-  document.querySelector("#dashQR p").innerText=`RM${sum.QR.toFixed(2)}`;
-  document.querySelector("#dashCC p").innerText=`RM${sum["Credit Card"].toFixed(2)}`;
+  
+  // Calculate daily averages for each payment type
+  const cashFiltered = filterData('Cash');
+  const qrFiltered = filterData('QR');
+  const ccFiltered = filterData('Credit Card');
+  
+  const cashDailyAvg = calculateDailyAverage(cashFiltered);
+  const qrDailyAvg = calculateDailyAverage(qrFiltered);
+  const ccDailyAvg = calculateDailyAverage(ccFiltered);
+  
+  // Update dashboard cards
+  document.querySelector("#dashCash p").innerText = `RM${sum.Cash.toFixed(2)}`;
+  document.querySelector("#dashCash .daily-avg").innerText = `RM${cashDailyAvg.toFixed(2)}/day`;
+  
+  document.querySelector("#dashQR p").innerText = `RM${sum.QR.toFixed(2)}`;
+  document.querySelector("#dashQR .daily-avg").innerText = `RM${qrDailyAvg.toFixed(2)}/day`;
+  
+  document.querySelector("#dashCC p").innerText = `RM${sum["Credit Card"].toFixed(2)}`;
+  document.querySelector("#dashCC .daily-avg").innerText = `RM${ccDailyAvg.toFixed(2)}/day`;
+  
+  // Update stats
+  const dailyAvg = calculateDailyAverage(filtered);
+  document.getElementById("totalSpent").innerText = `RM${totalSum.toFixed(2)}`;
+  document.getElementById("dailyAvg").innerText = `RM${dailyAvg.toFixed(2)}`;
+  document.getElementById("totalCount").innerText = filtered.length;
+  document.getElementById("totalEntries").innerText = filtered.length;
 }
 
 function addEntry(){
-  if(!desc.value||!amount.value) return alert("Isi semua dulu");
-  data.push({
-    datetime:datetime.value,
-    desc:desc.value,
-    category:category.value,
-    payment:payment.value,
-    amount:parseFloat(amount.value)
+  const descVal = document.getElementById("desc").value.trim();
+  const amountVal = document.getElementById("amount").value;
+  
+  if(!descVal || !amountVal) {
+    showStatus("Please fill in description and amount!", "error");
+    return;
+  }
+
+  const newEntry = {
+    datetime: document.getElementById("datetime").value,
+    desc: descVal,
+    category: document.getElementById("category").value,
+    payment: document.getElementById("payment").value,
+    amount: parseFloat(amountVal)
+  };
+
+  data.push(newEntry);
+  
+  if(saveData()){
+    showStatus("✅ Spending added!", "success");
+    document.getElementById("desc").value = "";
+    document.getElementById("amount").value = "";
+    document.getElementById("datetime").value = new Date().toISOString().slice(0,16);
+    render();
+  }
+}
+
+function deleteEntry(idx){
+  if(confirm("Delete this entry?")) {
+    data.splice(idx, 1);
+    if(saveData()){
+      showStatus("Deleted successfully", "success");
+      render();
+    }
+  }
+}
+
+function setDateFilter(filter){
+  dateFilter = filter;
+  
+  // Update button styling
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.classList.remove("active");
   });
-  saveData();
-  desc.value=""; amount.value="";
+  event.target.classList.add("active");
+  
+  // Show/hide custom date range
+  const customRange = document.getElementById("customRange");
+  if(filter === 'custom'){
+    customRange.classList.add("show");
+    // Set default dates
+    const today = new Date().toISOString().slice(0,10);
+    const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().slice(0,10);
+    document.getElementById("startDate").value = weekAgo;
+    document.getElementById("endDate").value = today;
+    customStart = weekAgo;
+    customEnd = today;
+  } else {
+    customRange.classList.remove("show");
+  }
+  
   render();
 }
 
-function exportCSV(){
-  let csv="Date,Description,Category,Payment,Amount\n";
-  data.forEach(d=>{
-    csv+=`${d.datetime},${d.desc},${d.category},${d.payment},${d.amount}\n`;
-  });
-  const blob=new Blob([csv],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="spending.csv";
-  a.click();
+function applyCustomRange(){
+  customStart = document.getElementById("startDate").value;
+  customEnd = document.getElementById("endDate").value;
+  render();
 }
 
-function importCSV(e){
-  const r=new FileReader();
-  r.onload=()=>{
-    r.result.split("\n").slice(1).forEach(l=>{
-      if(!l) return;
-      const [dt,desc,cat,pay,amt]=l.split(",");
-      data.push({datetime:dt,desc,category:cat,payment:pay,amount:+amt});
+function showTransactionModal(paymentType){
+  const filtered = filterData(paymentType);
+  const sorted = [...filtered].sort((a,b)=> new Date(b.datetime) - new Date(a.datetime));
+  
+  const total = sorted.reduce((sum, d) => sum + d.amount, 0);
+  const dailyAvg = calculateDailyAverage(sorted);
+  
+  // Set modal title with emoji
+  let emoji = '';
+  if(paymentType === 'Cash') emoji = '💵';
+  else if(paymentType === 'QR') emoji = '📱';
+  else if(paymentType === 'Credit Card') emoji = '💳';
+  
+  document.getElementById("modalTitle").innerText = `${emoji} ${paymentType} Transactions`;
+  document.getElementById("modalTotal").innerText = `RM${total.toFixed(2)}`;
+  document.getElementById("modalCount").innerText = `${sorted.length} transactions`;
+  document.getElementById("modalAvg").innerText = `Average: RM${dailyAvg.toFixed(2)}/day`;
+  
+  const container = document.getElementById("modalTransactions");
+  container.innerHTML = "";
+  
+  if(sorted.length === 0){
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">📭</div>
+        <div>No transactions found</div>
+      </div>
+    `;
+  } else {
+    sorted.forEach(d => {
+      const div = document.createElement("div");
+      div.className = "transaction-item";
+      div.innerHTML = `
+        <div class="header">
+          <div class="desc">${d.desc}</div>
+          <div class="amount">RM${d.amount.toFixed(2)}</div>
+        </div>
+        <div class="meta">
+          ${d.datetime.replace("T", " ")} • ${d.category}
+        </div>
+      `;
+      container.appendChild(div);
     });
-    saveData();
-    render();
-  };
-  r.readAsText(e.target.files[0]);
+  }
+  
+  document.getElementById("transactionModal").classList.add("show");
 }
 
+function closeModal(){
+  document.getElementById("transactionModal").classList.remove("show");
+}
+
+// Dashboard card click - directly show modal
 document.querySelectorAll(".dashboard-card").forEach(c=>{
   c.onclick=()=>{
-    filter = filter===c.dataset.pay ? null : c.dataset.pay;
-    render();
+    showTransactionModal(c.dataset.pay);
   }
 });
 
+// Close modal on background click
+document.getElementById("transactionModal").onclick = (e) => {
+  if(e.target.id === "transactionModal"){
+    closeModal();
+  }
+}
+
+function exportCSV(){
+  if(data.length === 0){
+    showStatus("No data to export!", "error");
+    return;
+  }
+
+  let csv="Date,Description,Category,Payment,Amount\n";
+  data.forEach(d=>{
+    const desc = d.desc.includes(',') ? `"${d.desc}"` : d.desc;
+    csv+=`${d.datetime},${desc},${d.category},${d.payment},${d.amount}\n`;
+  });
+  
+  const blob=new Blob([csv],{type:"text/csv"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`spending_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showStatus("CSV exported!", "success");
+}
+
+function importCSV(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const r=new FileReader();
+  r.onload=()=>{
+    try {
+      const lines = r.result.split("\n");
+      let imported = 0;
+      
+      lines.slice(1).forEach(line=>{
+        if(!line.trim()) return;
+        
+        const matches = line.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g);
+        if(!matches || matches.length < 5) return;
+        
+        const [dt, desc, cat, pay, amt] = matches.map(m => m.replace(/^"|"$/g, '').trim());
+        
+        data.push({
+          datetime: dt,
+          desc: desc,
+          category: cat,
+          payment: pay,
+          amount: parseFloat(amt)
+        });
+        imported++;
+      });
+      
+      if(saveData()){
+        showStatus(`✅ Imported ${imported} entries!`, "success");
+        render();
+      }
+    } catch(err) {
+      console.error("Import error:", err);
+      showStatus("Error importing CSV file!", "error");
+    }
+  };
+  r.readAsText(file);
+  e.target.value = '';
+}
+
+function clearAllData(){
+  if(confirm("⚠️ Delete ALL spending data? This cannot be undone!")) {
+    if(confirm("Are you REALLY sure? This will delete everything!")) {
+      data = [];
+      saveData();
+      showStatus("All data cleared", "success");
+      render();
+    }
+  }
+}
+
+// Initial render
 render();
 </script>
 </body>
