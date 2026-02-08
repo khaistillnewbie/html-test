@@ -1,14 +1,12 @@
-<!-- iOS Home Screen icon -->
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="icon" href="icon.png" type="image/png">
-<meta name="theme-color" content="#ffffff">
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spending Tracker PRO</title>
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png" type="image/png">
+<meta name="theme-color" content="#ffffff">
 <style>
 :root{
   --bg:#f6f7fb; --card:#fff; --primary:#4f46e5;
@@ -46,10 +44,8 @@ table{width:100%;border-collapse:collapse;font-size:13px; display:block; overflo
 th,td{padding:10px;border-bottom:1px solid #e5e7eb; min-width:110px;}
 th{background:#f3f4f6;}
 footer{text-align:center;font-size:12px;color:var(--muted);margin-top:20px;}
-.over-limit{color:red; font-weight:700;}
 </style>
 </head>
-
 <body>
 
 <div class="center">
@@ -139,16 +135,17 @@ function gmt8Now(){
   return new Date(utc + 8*60*60*1000);
 }
 
-// Set datetime input: last entry or now
-function setDatetimeInput(){
+// Set datetime input default to GMT+8 but editable
+function setDefaultDatetime(){
   const dtInput = document.getElementById("datetime");
   if(!dtInput.value){
-    if(data.length>0) dtInput.value = data[data.length-1].datetime;
-    else dtInput.value = gmt8Now().toISOString().slice(0,16);
+    const current = gmt8Now();
+    dtInput.value = current.toISOString().slice(0,16);
   }
 }
+setDefaultDatetime();
 
-// Smart dashboard render
+// Render table & dashboard
 function render(){
   const tbody=document.getElementById("tableBody");
   tbody.innerHTML="";
@@ -175,9 +172,7 @@ function render(){
     const limit = parseFloat(document.getElementById("limit"+key.replace(" ","")).value);
     if(limit>0 && sum[key] > limit){
       dash[key].style.borderTopColor = "red";
-      dash[key].classList.add("over-limit");
     } else {
-      dash[key].classList.remove("over-limit");
       if(key==="Cash") dash[key].style.borderTopColor="var(--cash)";
       if(key==="QR") dash[key].style.borderTopColor="var(--qr)";
       if(key==="Credit Card") dash[key].style.borderTopColor="var(--cc)";
@@ -185,27 +180,35 @@ function render(){
   });
 
   localStorage.setItem("spendingData",JSON.stringify(data));
-  setDatetimeInput();
 }
 
+// Add entry
 function addEntry(){
-  if(!desc.value||!amount.value) return alert("Isi semua dulu");
-  let dt = new Date(datetime.value);
+  const descInput = document.getElementById("desc");
+  const amountInput = document.getElementById("amount");
+  const datetimeInput = document.getElementById("datetime");
+
+  if(!descInput.value || !amountInput.value) return alert("Isi semua dulu");
+
+  let dt = new Date(datetimeInput.value);
   const offset = dt.getTimezoneOffset()*60000;
-  dt = new Date(dt.getTime() - offset);
+  dt = new Date(dt.getTime() - offset); // force GMT+8
   const dtStr = dt.toISOString().slice(0,16);
 
   data.push({
     datetime: dtStr,
-    desc:desc.value,
-    category:category.value,
-    payment:payment.value,
-    amount:parseFloat(amount.value)
+    desc: descInput.value,
+    category:document.getElementById("category").value,
+    payment:document.getElementById("payment").value,
+    amount:parseFloat(amountInput.value)
   });
-  desc.value=""; amount.value="";
+
+  descInput.value=""; amountInput.value="";
+  setDefaultDatetime();
   render();
 }
 
+// Export CSV
 function exportCSV(){
   let csv="Date,Description,Category,Payment,Amount\n";
   data.forEach(d=>{
@@ -218,12 +221,13 @@ function exportCSV(){
   a.click();
 }
 
+// Import CSV
 function importCSV(event){
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = function(e){
-    const text = e.target.result.split("\n").slice(1);
-    text.forEach(line=>{
+    const lines = e.target.result.split("\n").slice(1);
+    lines.forEach(line=>{
       if(!line) return;
       const [datetime,desc,category,payment,amount] = line.split(",");
       data.push({datetime,desc,category,payment,amount:parseFloat(amount)});
@@ -233,15 +237,16 @@ function importCSV(event){
   reader.readAsText(file);
 }
 
+// Dashboard filter
 document.querySelectorAll(".dashboard-card").forEach(card=>{
   card.addEventListener("click",()=>{
     const pay = card.dataset.pay;
-    if(currentFilter === pay) currentFilter = null;
-    else currentFilter = pay;
+    currentFilter = currentFilter===pay ? null : pay;
     render();
   });
 });
 
+// Initial render
 render();
 </script>
 </body>
